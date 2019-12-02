@@ -66,7 +66,7 @@ svi = SVI(model, guide, optimizer, loss=Trace_ELBO())
 
 n_steps = 50
 # do gradient steps
-for step in range(n_steps):
+for _ in range(n_steps):
     svi.step(data)
 
 
