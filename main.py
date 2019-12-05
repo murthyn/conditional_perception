@@ -10,18 +10,21 @@ from pyro.optim import Adam
 
 from random import shuffle
 
+# sample as many thetas as in observtions
+# compare if the bags of observations and thetas match up
 
-true_alpha = 10
+
+true_alpha = 10 # uniform from -alpha to alpha
 coherence = 0.2
 samples = 100
 data = []
 
-coherent_dist = dist.Normal(true_alpha, 5)
-for i in range(int(0.2 * samples)):
+coherent_dist = dist.Normal(true_alpha, 5) # constant * 1 / coherence
+for i in range(int(coherence * samples)):
     data.append(pyro.sample("coherent_point", coherent_dist))
 
 incoherent_dist = dist.Uniform(-90, 90)
-for i in range(samples - int(0.2 * samples)):
+for i in range(samples - int(coherence * samples)):
     data.append(pyro.sample("incoherent_point", incoherent_dist))
 
 shuffle(data)
@@ -29,7 +32,7 @@ shuffle(data)
 
 def model(data):
     hypothesis_prob = torch.tensor(0.5)
-    alpha = torch.tensor(10.0)
+    alpha = torch.tensor(10.0) # should not be learned
 
     h = pyro.sample("h", dist.Bernoulli(hypothesis_prob))
 
@@ -40,7 +43,7 @@ def model(data):
 
     # loop over the observed data
     for i in range(len(data)):
-        pyro.sample("obs_{}".format(i), dist.Normal(0, alpha), obs=data[i])
+        pyro.sample(f"obs_{i}", theta, obs=data[i]) # convert to MCMC, create sample function for one sample, run n times (right now it's one theta)
 
 
 def guide(data):
