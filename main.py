@@ -27,9 +27,11 @@ coherence = 0.2
 samples = 100
 data = []
 
-coherent_dist = dist.Normal(true_alpha, 3) # constant * 1 / coherence
+coherent_dist = dist.Normal(true_alpha, 1) # constant * 1 / coherence
 for i in range(int(coherence * samples)):
-    data.append(pyro.sample("coherent_point", coherent_dist))
+    sampled_point = pyro.sample("coherent_point", coherent_dist)
+    print(sampled_point)
+    data.append(sampled_point)
 
 incoherent_dist = dist.Uniform(-alpha, alpha) # incoherence chosen from all possible vectors
 for i in range(samples - int(coherence * samples)):
@@ -47,7 +49,7 @@ def model(data):
     coefs = pyro.sample('beta', dist.Normal(coefs_mean, torch.tensor([alpha] * dim)))
     y = pyro.sample('y', dist.Bernoulli(logits=(coefs * data).sum(-1))) #obs=labels
     return y
-    
+
     # hypothesis_prob = torch.tensor(0.5)
     # h = pyro.sample("h", dist.Bernoulli(hypothesis_prob))
     # print('h', h)
