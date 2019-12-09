@@ -13,48 +13,6 @@ from random import shuffle
 # sample as many thetas as in observtions
 # compare if the bags of observations and thetas match up
 
-'''
-
-
-
-def model(data):
-    hypothesis_prob = torch.tensor(0.5)
-    
-
-    h = pyro.sample("h", dist.Bernoulli(hypothesis_prob))
-
-    if h == 1:
-        theta = pyro.sample("theta", dist.Uniform(0, alpha))
-    else:
-        theta = pyro.sample("theta", dist.Uniform(-alpha, 0))
-
-    # loop over the observed data
-    for i in range(len(data)):
-        pyro.sample(f"obs_{i}", theta, obs=data[i]) # convert to MCMC, create sample function for one sample, run n times (right now it's one theta)
-
-
-def guide(data):
-    hypothesis_prob_q = pyro.param("hypothesis_prob_q", torch.tensor(0.5),
-                         constraint=constraints.unit_interval)
-    alpha_q = pyro.param("alpha_q", torch.tensor(10.0),
-                        constraint=constraints.positive)
-
-    h_q = pyro.sample("h", dist.Bernoulli(hypothesis_prob_q))
-
-    if h_q == 1:
-        pyro.sample("theta", dist.Uniform(0, alpha_q))
-    else:
-        pyro.sample("theta", dist.Uniform(-alpha_q, 0))
-
-
-# set up the optimizer
-adam_params = {"lr": 0.0005, "betas": (0.90, 0.999)}
-optimizer = Adam(adam_params)
-
-# setup the inference algorithm
-svi = SVI(model, guide, optimizer, loss=Trace_ELBO())
-'''
-
 ## Alpha ################
 alpha = torch.tensor(10.0) # should not be learned
 
@@ -89,6 +47,7 @@ def model(data):
     coefs = pyro.sample('beta', dist.Normal(coefs_mean, torch.tensor([alpha] * dim)))
     y = pyro.sample('y', dist.Bernoulli(logits=(coefs * data).sum(-1))) #obs=labels
     return y
+    
     # hypothesis_prob = torch.tensor(0.5)
     # h = pyro.sample("h", dist.Bernoulli(hypothesis_prob))
     # print('h', h)
